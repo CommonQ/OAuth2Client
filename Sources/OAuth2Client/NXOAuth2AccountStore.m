@@ -378,6 +378,11 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
     return [self handleRedirectURL:aURL isLinkedin:NO error:nil];
 }
 
+-(BOOL)handleRedirectURL:(NSURL *)URL isLinkedin:(BOOL)isLinkedin
+{
+    return [self handleRedirectURL:URL isLinkedin:isLinkedin error:nil];
+}
+
 - (BOOL)handleRedirectURL:(NSURL *)aURL isLinkedin:(BOOL)isLinkedin error:(NSError **)error
 {
     
