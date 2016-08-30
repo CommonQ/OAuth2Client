@@ -375,7 +375,46 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
 #pragma mark Handle OAuth Redirects
 - (BOOL)handleRedirectURL:(NSURL *)aURL
 {
-    return [self handleRedirectURL:aURL error:nil];
+    return [self handleRedirectURL:aURL isLinkedin:NO error:nil];
+}
+
+- (BOOL)handleRedirectURL:(NSURL *)aURL isLinkedin:(BOOL)isLinkedin error:(NSError **)error
+{
+    
+    __block NSURL *fixedRedirectURL = nil;
+    NSSet *accountTypes;
+    
+    @synchronized (self.configurations) {
+        accountTypes = [self.configurations keysOfEntriesPassingTest:^(id key, id obj, BOOL *stop) {
+            NSDictionary *configuration = obj;
+            NSURL *redirectURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationRedirectURL];
+            if ( [[[aURL absoluteString] lowercaseString] hasPrefix:[[redirectURL absoluteString] lowercaseString]]) {
+                
+                // WORKAROUND: The URL which is passed to this method may be lower case also the scheme is registered in camel case. Therefor replace the prefix with the stored redirectURL.
+                if (fixedRedirectURL == nil) {
+                    fixedRedirectURL = [self fixRedirectURL: aURL storedURL:redirectURL];
+                }
+                
+                return YES;
+            } else {
+                return NO;
+            }
+        }];
+    }
+    
+    NSString* accountType;
+    if (isLinkedin) {
+        accountType = @"LinkedinESN";
+    }else{
+        accountType=@"ESN";
+    }
+
+        NXOAuth2Client *client = [self pendingOAuthClientForAccountType:accountType];
+        if ([client openRedirectURL:fixedRedirectURL error:error]) {
+            return YES;
+        }
+    
+    return NO;
 }
 
 - (BOOL)handleRedirectURL:(NSURL *)aURL error: (NSError**) error

@@ -55,6 +55,7 @@
     NSString *anAccessToken = [jsonDict objectForKey:@"access_token"];
     NSString *aRefreshToken = [jsonDict objectForKey:@"refresh_token"];
     NSObject *scopeObj = [jsonDict objectForKey:@"scope"];
+    NSString *idToken = [jsonDict objectForKey:@"id_token"];
     
     // if the response overrides token_type we take it from the response
     if ([jsonDict objectForKey:@"token_type"]) {
@@ -80,7 +81,8 @@
                                            expiresAt:expiryDate
                                                scope:scope
                                         responseBody:theResponseBody
-                                           tokenType:tokenType];
+                                           tokenType:tokenType
+                                            idToken:idToken];
 }
 
 - (instancetype)initWithAccessToken:(NSString *)anAccessToken;
@@ -112,10 +114,11 @@
                                            expiresAt:anExpiryDate
                                                scope:aScope
                                         responseBody:aResponseBody
-                                           tokenType:nil];
+                                           tokenType:nil
+                                             idToken:nil];
 }
 
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate scope:(NSSet *)aScope responseBody:(NSString *)aResponseBody tokenType:(NSString *)aTokenType
+- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate scope:(NSSet *)aScope responseBody:(NSString *)aResponseBody tokenType:(NSString *)aTokenType idToken:(NSString*) aIDToken
 {
     // a token object without an actual token is not what we want!
     NSAssert1(anAccessToken, @"No token from token response: %@", aResponseBody);
@@ -131,6 +134,7 @@
         scope        = aScope ? [aScope copy] : [[NSSet alloc] init];
         responseBody = [aResponseBody copy];
         tokenType    = [aTokenType copy];
+        idToken      =  [aIDToken copy];
     }
     return self;
 }
@@ -151,6 +155,7 @@
 @synthesize scope;
 @synthesize responseBody;
 @synthesize tokenType;
+@synthesize idToken;
 
 - (NSString*)tokenType
 {
@@ -191,6 +196,7 @@
     [aCoder encodeObject:expiresAt forKey:@"expiresAt"];
     [aCoder encodeObject:scope forKey:@"scope"];
     [aCoder encodeObject:responseBody forKey:@"responseBody"];
+    [aCoder encodeObject:idToken forKey:@"id_token"];
     if (tokenType) {
         [aCoder encodeObject:tokenType forKey:@"tokenType"];
     }
@@ -213,6 +219,7 @@
         scope = [[aDecoder decodeObjectForKey:@"scope"] copy];
         responseBody = [[aDecoder decodeObjectForKey:@"responseBody"] copy];
         tokenType = [[aDecoder decodeObjectForKey:@"tokenType"] copy];
+        idToken = [[aDecoder decodeObjectForKey:@"id_token"] copy];
     }
     return self;
 }

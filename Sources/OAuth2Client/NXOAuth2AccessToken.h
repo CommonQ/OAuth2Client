@@ -23,6 +23,7 @@
     NSDate *expiresAt;
     NSSet *scope;
     NSString *responseBody;
+    NSString * idToken;
 }
 @property (nonatomic, readonly) NSString *accessToken;
 @property (nonatomic, readonly) NSString *refreshToken;
@@ -32,6 +33,7 @@
 @property (nonatomic, readonly) BOOL hasExpired;
 @property (nonatomic, readonly) NSSet *scope;
 @property (nonatomic, readonly) NSString *responseBody;
+@property (nonatomic, readonly) NSString *idToken;
 
 + (instancetype)tokenWithResponseBody:(NSString *)responseBody;
 
